@@ -2,18 +2,29 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy to Firebase Hosting on merge
-on:
+'on':
   push:
     branches:
-      - main
+      - main # Or whatever your main branch is
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Or your preferred Node.js version (LTS)
+      - name: Install Dependencies
+        run: npm ci # or npm install
+      - name: Build Next.js app
+        run: npm run build # This will run 'next build' which produces the 'out' folder
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EZAIM_WEBSITE }}
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EZAIM_WEBSITE }}' # Make sure this matches your secret name
           channelId: live
-          projectId: ezaim-website
+          projectId: ezaim-website # Replace with your Firebase Project ID
+          # The entryPoint should be the root of your repo if firebase.json is there
+          # and firebase.json's hosting.public is set to "out"
+          # entryPoint: ./ # This is often the default and might not be needed
